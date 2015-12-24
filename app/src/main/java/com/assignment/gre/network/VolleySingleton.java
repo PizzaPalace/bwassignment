@@ -1,8 +1,9 @@
 package com.assignment.gre.network;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.LruCache;
-
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -13,36 +14,54 @@ import com.android.volley.toolbox.Volley;
  */
 public class VolleySingleton {
 
-    private static VolleySingleton sInstance=null;
-    private ImageLoader mImageLoader;
+    private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
-    private VolleySingleton(){
-        mRequestQueue=Volley.newRequestQueue(/*insert context*/);
-        mImageLoader=new ImageLoader(mRequestQueue,new ImageLoader.ImageCache() {
+    private ImageLoader mImageLoader;
+    private static Context mCtx;
 
-            private LruCache<String, Bitmap> cache=new LruCache<>((int)(Runtime.getRuntime().maxMemory()/1024)/8);
-            @Override
-            public Bitmap getBitmap(String url) {
-                return cache.get(url);
-            }
+    private VolleySingleton(Context context) {
+        mCtx = context;
+        mRequestQueue = getRequestQueue();
 
-            @Override
-            public void putBitmap(String url, Bitmap bitmap) {
-                cache.put(url, bitmap);
-            }
-        });
+        mImageLoader = new ImageLoader(mRequestQueue,
+                new ImageLoader.ImageCache() {
+                    private final LruCache<String, Bitmap>
+                            cache = new LruCache<String, Bitmap>(20);
+
+                    @Override
+                    public Bitmap getBitmap(String url) {
+                        return cache.get(url);
+                    }
+
+                    @Override
+                    public void putBitmap(String url, Bitmap bitmap) {
+                        cache.put(url, bitmap);
+                    }
+                });
     }
-    public static VolleySingleton getInstance(){
-        if(sInstance==null)
-        {
-            sInstance=new VolleySingleton();
+
+    public static synchronized VolleySingleton getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new VolleySingleton(context);
         }
-        return sInstance;
+        return mInstance;
     }
-    public RequestQueue getRequestQueue(){
+
+    public RequestQueue getRequestQueue() {
+        if (mRequestQueue == null) {
+            // getApplicationContext() is key, it keeps you from leaking the
+            // Activity or BroadcastReceiver if someone passes one in.
+            mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
+        }
         return mRequestQueue;
     }
-    public ImageLoader getImageLoader(){
+
+    public <T> void addToRequestQueue(Request<T> req) {
+        getRequestQueue().add(req);
+    }
+
+    public ImageLoader getImageLoader() {
         return mImageLoader;
     }
+
 }
