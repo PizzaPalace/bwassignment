@@ -21,17 +21,18 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
-    
+    private static final String REAL_TYPE = " REAL";
+
     private static final String COMMA_SEPARATOR = " ,";
     private static final String TABLE_CREATE_ENTRIES =
             "CREATE TABLE " +
                     DBContract.DBEntry.TABLE_NAME + " (" +
                     DBContract.DBEntry._ID + " INTEGER PRIMARY KEY" + COMMA_SEPARATOR +
-                    DBContract.DBEntry.WORD_ID + TEXT_TYPE + COMMA_SEPARATOR +
+                    DBContract.DBEntry.WORD_ID + INTEGER_TYPE + COMMA_SEPARATOR +
                     DBContract.DBEntry.WORD + TEXT_TYPE + COMMA_SEPARATOR +
-                    DBContract.DBEntry.VARIANT + TEXT_TYPE + COMMA_SEPARATOR +
+                    //DBContract.DBEntry.VARIANT + TEXT_TYPE + COMMA_SEPARATOR +
                     DBContract.DBEntry.MEANING + TEXT_TYPE + COMMA_SEPARATOR +
-                    DBContract.DBEntry.RATIO + TEXT_TYPE + " )";
+                    DBContract.DBEntry.RATIO + REAL_TYPE + " )";
 
     //ArrayList<HashMap<String,Object>> mData;
 
@@ -58,14 +59,14 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public long insertData(String id,String word,String variant,String meaning, String ratio){
+    public long insertData(int id,String word,String meaning, double ratio){
 
         SQLiteDatabase database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(DBContract.DBEntry.WORD_ID,id);
         contentValues.put(DBContract.DBEntry.WORD, word);
-        contentValues.put(DBContract.DBEntry.VARIANT, variant);
+        //contentValues.put(DBContract.DBEntry.VARIANT, variant);
         contentValues.put(DBContract.DBEntry.MEANING, meaning);
         contentValues.put(DBContract.DBEntry.RATIO, ratio);
 
@@ -89,17 +90,17 @@ public class DBHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             mData = new ArrayList<HashMap<String,Object>>();
             do{
-                String word_id = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.DBEntry.WORD_ID));
+                int word_id = cursor.getInt(cursor.getColumnIndexOrThrow(DBContract.DBEntry.WORD_ID));
                 String word = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.DBEntry.WORD));
+                //String variant = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.DBEntry.VARIANT));
                 String meaning = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.DBEntry.MEANING));
-                String variant = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.DBEntry.VARIANT));
-                String ratio = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.DBEntry.RATIO));
+                double ratio = cursor.getDouble(cursor.getColumnIndexOrThrow(DBContract.DBEntry.RATIO));
 
                 HashMap<String,Object> map = new HashMap<String,Object>();
 
                 map.put(DBContract.DBEntry.WORD_ID,word_id);
                 map.put(DBContract.DBEntry.WORD,word);
-                map.put(DBContract.DBEntry.VARIANT,variant);
+                //map.put(DBContract.DBEntry.VARIANT,variant);
                 map.put(DBContract.DBEntry.MEANING,meaning);
                 map.put(DBContract.DBEntry.RATIO,ratio);
 

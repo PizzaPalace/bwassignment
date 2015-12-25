@@ -21,12 +21,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.assignment.gre.R;
+import com.assignment.gre.common.Constants;
+import com.assignment.gre.database.DBHelper;
 import com.assignment.gre.fragments.ContentFragment;
 import com.assignment.gre.fragments.NavigationDrawerFragment;
 import com.assignment.gre.network.VolleySingleton;
 import com.assignment.gre.views.SlidingTabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity
@@ -42,6 +49,8 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private SlidingTabLayout mTabs;
 
+    // Datastructure to hold key-value pairs
+    ArrayList<HashMap<String,Object>> mData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +76,8 @@ public class MainActivity extends AppCompatActivity
         mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
         mTabs.setViewPager(mViewPager);
 
+        mData = new ArrayList<HashMap<String,Object>>();
+
         RequestQueue requestQueue = VolleySingleton.getInstance(getApplicationContext()).getRequestQueue();
         String url = "http://appsculture.com/vocab/words.json";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
@@ -75,6 +86,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.v("Response: ", response.toString());
+                        jsonParser(response);
                     }
                 }, new Response.ErrorListener() {
 
@@ -87,9 +99,7 @@ public class MainActivity extends AppCompatActivity
                 });
 
         requestQueue.add(jsObjRequest);
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -143,5 +153,58 @@ public class MainActivity extends AppCompatActivity
         public int getCount() {
             return count;
         }
+    }
+
+    // method to parse JSON obtained from network
+    private void jsonParser(JSONObject jsonObject) {
+
+        try {
+            JSONArray jsonArray = jsonObject.getJSONArray("words");
+
+            int length = jsonArray.length();
+            for (int i = 0; i < length; i++) {
+                HashMap<String,Object> map = new HashMap<String,Object>();
+                JSONObject jObject = jsonArray.getJSONObject(i);
+
+                map.put(Constants.ID, jObject.getInt("id"));
+                map.put(Constants.WORD, jObject.getString("word"));
+                map.put(Constants.MEANING, jObject.getString("meaning"));
+                map.put(Constants.RATIO, jObject.getDouble("ratio"));
+
+                mData.add(map);
+                map = null;
+
+            }
+            //map = null;
+            Log.v("data",mData.toString());
+            populateDatabase();
+        }
+        catch(JSONException exception){
+            exception.printStackTrace();
+        }
+    }
+
+    private void populateDatabase(){
+
+        DBHelper database = new DBHelper(this);
+        database.deleteAllData();
+
+        int length = mData.size();
+
+        for(int i=0; i<length; i++){
+
+            HashMap<String,Object> map = mData.get(i);
+
+            int id = (int)map.get("id");
+            String word = (String)map.get("word");
+            String meaning = (String)map.get("meaning");
+            double ratio = (double)map.get("ratio");
+
+            map = null;
+
+            database.insertData(id,word,meaning,ratio);
+        }
+
+        database.queryAllData();
     }
 }
