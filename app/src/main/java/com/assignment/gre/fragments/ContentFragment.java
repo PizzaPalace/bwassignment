@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import com.assignment.gre.R;
 import com.assignment.gre.adapters.RecyclerAdapter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -27,6 +30,8 @@ public class ContentFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String DATA = "DATA";
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -35,7 +40,8 @@ public class ContentFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    String[] mdataset;
+
+    ArrayList<HashMap<String,Object>> mdataset;
 
     private OnFragmentInteractionListener mListener;
 
@@ -53,6 +59,8 @@ public class ContentFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,6 +75,7 @@ public class ContentFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
     }
 
@@ -76,7 +85,7 @@ public class ContentFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_content, container, false);
 
-        mdataset = getResources().getStringArray(R.array.tabs);
+        //mdataset = getResources().getStringArray(R.array.tabs);
 
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recycler);
         mRecyclerView.setHasFixedSize(true);
@@ -129,4 +138,12 @@ public class ContentFragment extends Fragment {
         public void onContentFragmentInteraction(Uri uri);
     }
 
+    public void setAdapter(ArrayList<HashMap<String,Object>> data){
+
+        mdataset = data;
+        if(data != null) {
+            mAdapter = new RecyclerAdapter(mdataset);
+            mRecyclerView.setAdapter(mAdapter);
+        }
+    }
 }

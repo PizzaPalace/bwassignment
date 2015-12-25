@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
 
             ContentFragment fragment = ContentFragment.newInstance("","");
+
             return fragment;
         }
 
@@ -177,6 +178,7 @@ public class MainActivity extends AppCompatActivity
             }
             //map = null;
             Log.v("data",mData.toString());
+            //setViewPagerAdapter();
             populateDatabase();
         }
         catch(JSONException exception){
@@ -184,6 +186,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // method to check database's schema
     private void populateDatabase(){
 
         DBHelper database = new DBHelper(this);
@@ -207,4 +210,16 @@ public class MainActivity extends AppCompatActivity
 
         database.queryAllData();
     }
+
+    /*private void setViewPagerAdapter(){
+
+        mViewPager.setAdapter(new SlidingPagerAdapter(getSupportFragmentManager()));
+        mTabs.setCustomTabView(R.layout.tab_view, R.id.tabText);
+        //make sure all tabs take the full horizontal screen space and divide it equally amongst themselves
+        mTabs.setDistributeEvenly(true);
+        mTabs.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        //color of the tab indicator
+        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
+        mTabs.setViewPager(mViewPager);
+    }*/
 }
