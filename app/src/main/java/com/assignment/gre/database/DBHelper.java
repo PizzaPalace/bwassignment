@@ -21,6 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
+    
     private static final String COMMA_SEPARATOR = " ,";
     private static final String TABLE_CREATE_ENTRIES =
             "CREATE TABLE " +
