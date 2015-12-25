@@ -22,12 +22,6 @@ public class AlarmUtil {
     // The pending intent that is triggered when the alarm fires.
     private PendingIntent mAlarmIntent;
 
-    // BEGIN_INCLUDE(set_alarm)
-    /**
-     * Sets a repeating alarm that runs once a day at approximately 8:30 a.m. When the
-     * alarm fires, the app broadcasts an Intent to this WakefulBroadcastReceiver.
-     * @param context
-     */
     public void setAlarm(Context context) {
         mAlarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -35,7 +29,7 @@ public class AlarmUtil {
 
         mAlarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                       SystemClock.elapsedRealtime() +
-                7*1000, mAlarmIntent);
+                70 * 1000, mAlarmIntent);
 
         mAlarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                   AlarmManager.INTERVAL_HOUR,

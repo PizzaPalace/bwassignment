@@ -20,7 +20,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.assignment.gre.R;
 import com.assignment.gre.adapters.RecyclerAdapter;
-import com.assignment.gre.backgroundtasks.DataFetcherTask;
 import com.assignment.gre.backgroundtasks.ReadDatabaseTask;
 import com.assignment.gre.common.Constants;
 import com.assignment.gre.common.DatabaseUtil;
@@ -37,13 +36,13 @@ import java.util.HashMap;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ContentFragment.OnFragmentInteractionListener} interface
+ * {@link GridFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ContentFragment#newInstance} factory method to
+ * Use the {@link GridFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContentFragment extends Fragment
-        implements GREListListener, DatabaseListener {
+public class GridFragment extends Fragment
+                          implements GREListListener, DatabaseListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -59,7 +58,7 @@ public class ContentFragment extends Fragment
     //String[] mdataset;
     ArrayList<HashMap<String,Object>> mdataset;
 
-    private OnFragmentInteractionListener mListener;
+    private OnGridFragmentInteractionListener mListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -67,11 +66,11 @@ public class ContentFragment extends Fragment
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ContentFragment.
+     * @return A new instance of fragment GridFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ContentFragment newInstance(String param1, String param2) {
-        ContentFragment fragment = new ContentFragment();
+    public static GridFragment newInstance(String param1, String param2) {
+        GridFragment fragment = new GridFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -79,7 +78,7 @@ public class ContentFragment extends Fragment
         return fragment;
     }
 
-    public ContentFragment() {
+    public GridFragment() {
         // Required empty public constructor
     }
 
@@ -101,8 +100,7 @@ public class ContentFragment extends Fragment
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recycler);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        //mLayoutManager = new GridLayoutManager(getActivity(),2);
+        mLayoutManager = new GridLayoutManager(getActivity(),2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         if(DatabaseUtil.isDBEmpty(getActivity()))
@@ -116,7 +114,7 @@ public class ContentFragment extends Fragment
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onContentFragmentInteraction(uri);
+            mListener.onGridFragmentInteraction(uri);
         }
     }
 
@@ -124,7 +122,7 @@ public class ContentFragment extends Fragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnGridFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -138,12 +136,12 @@ public class ContentFragment extends Fragment
     }
 
     @Override
-    public void onWordListDownloaded(ArrayList<HashMap<String, Object>> wordlist) {
+    public void onDatabaseQueried(ArrayList<HashMap<String, Object>> wordlist) {
         setAdapter(wordlist);
     }
 
     @Override
-    public void onDatabaseQueried(ArrayList<HashMap<String, Object>> wordlist) {
+    public void onWordListDownloaded(ArrayList<HashMap<String, Object>> wordlist) {
         setAdapter(wordlist);
     }
 
@@ -157,9 +155,9 @@ public class ContentFragment extends Fragment
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnGridFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onContentFragmentInteraction(Uri uri);
+        public void onGridFragmentInteraction(Uri uri);
     }
 
     private void setAdapter(){
@@ -174,7 +172,7 @@ public class ContentFragment extends Fragment
                         mdataset = JSONHelper.jsonParser(response);
                         mAdapter = new RecyclerAdapter(mdataset,getActivity());
                         mRecyclerView.setAdapter(mAdapter);
-                        DatabaseUtil.populateDatabase(mdataset,getActivity());
+                        DatabaseUtil.populateDatabase(mdataset, getActivity());
                     }
                 }, new Response.ErrorListener() {
 

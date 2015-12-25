@@ -3,9 +3,9 @@
     <!-- From: file:/C:/Users/rahul/Downloads/opentok-android-sdk-samples-master/gre/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string-array name="tabs">
-        <item>Tab 1</item>
-        <item>Tab 2</item>
-        <item>Tab 3</item>
+        <item>List</item>
+        <item>Grid</item>
+
     </string-array>
     <!-- From: file:/C:/Users/rahul/Downloads/opentok-android-sdk-samples-master/gre/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/res/values/values.xml -->
     <eat-comment/>
@@ -43,7 +43,7 @@
     <color name="colorAccent">#FF9800</color>
     <color name="colorDivider">#B6B6B6</color>
     <color name="colorHighlight">#B6B6B6</color>
-    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimary">#FF2400</color>
     <color name="colorPrimaryDark">#0288D1</color>
     <color name="colorPrimaryLight">#B3E5FC</color>
     <color name="colorPrimaryText">#212121</color>

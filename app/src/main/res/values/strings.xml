@@ -12,9 +12,9 @@
 
     <!-- tab titles -->
     <string-array name="tabs">
-        <item>Tab 1</item>
-        <item>Tab 2</item>
-        <item>Tab 3</item>
+        <item>List</item>
+        <item>Grid</item>
+
     </string-array>
 
 </resources>

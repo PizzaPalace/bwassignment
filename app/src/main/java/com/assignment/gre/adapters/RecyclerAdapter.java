@@ -32,12 +32,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         // each data item is just a string in this case
+        //private TextView mIdTextView;
         private TextView mWordTextView;
         private ImageView mImageView;
         private TextView mMeaningTextView;
 
         public ViewHolder(View v) {
             super(v);
+            //mIdTextView = (TextView)v.findViewById(R.id.id_text_view);
             mWordTextView = (TextView)v.findViewById(R.id.word_text_view);
             mImageView = (ImageView)v.findViewById(R.id.image_view);
             mMeaningTextView = (TextView)v.findViewById(R.id.meaning_text_view);
@@ -80,7 +82,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         else{
 
         }
-
+        //holder.mIdTextView.setText(Integer.toString(id));
         holder.mWordTextView.setText(word);
         holder.mMeaningTextView.setText(meaning);
     }
