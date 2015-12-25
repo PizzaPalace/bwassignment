@@ -97,27 +97,16 @@ public class ContentFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_content, container, false);
 
-        //mdataset = getResources().getStringArray(R.array.tabs);
-
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recycler);
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        if(DatabaseUtil.isDBEmpty(getActivity())){
-            Log.v("h3333i","dadas33333d");
+        if(DatabaseUtil.isDBEmpty(getActivity()))
             setAdapter();
-        }
-        else {
-            Log.v("hi","dadasd");
+        else
             new ReadDatabaseTask(this, getActivity().getApplicationContext()).execute();
-        }
-
-        /*mdataset = DatabaseUtil.readDatabase(getActivity());
-            mAdapter = new RecyclerAdapter(mdataset,getActivity());
-            mRecyclerView.setAdapter(mAdapter);*/
-
 
         return view;
     }
@@ -148,13 +137,11 @@ public class ContentFragment extends Fragment
 
     @Override
     public void onWordListDownloaded(ArrayList<HashMap<String, Object>> wordlist) {
-        Log.v("somme","senne");
         setAdapter(wordlist);
     }
 
     @Override
     public void onDatabaseQueried(ArrayList<HashMap<String, Object>> wordlist) {
-        Log.v("dfsfsdf","Sdfsdfsdf");
         setAdapter(wordlist);
     }
 

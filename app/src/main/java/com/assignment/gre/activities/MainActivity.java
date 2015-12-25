@@ -1,6 +1,8 @@
 package com.assignment.gre.activities;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -29,6 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.assignment.gre.R;
+import com.assignment.gre.common.AlarmUtil;
 import com.assignment.gre.common.Constants;
 import com.assignment.gre.common.DatabaseUtil;
 import com.assignment.gre.database.DBHelper;
@@ -53,7 +56,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationDrawerFragment.OnFragmentInteractionListener,
         ContentFragment.OnFragmentInteractionListener{
 
+    // for use with Lollipop and Marshmallow
     JobScheduler mJobScheduler;
+
+
+
     private static int count = 3;
 
     private Toolbar mToolbar;
@@ -106,10 +113,11 @@ public class MainActivity extends AppCompatActivity
 
         requestQueue.add(jsObjRequest);*/
 
-        //setupJob();
+        if(Build.VERSION.SDK_INT < 22)
+            scheduleAlarm();
 
-
-
+        else if(Build.VERSION.SDK_INT >= 22)
+            setupJob();
     }
 
     private void initializeDrawerLayout(){
@@ -264,6 +272,13 @@ public class MainActivity extends AppCompatActivity
                 .build();
         int result = mJobScheduler.schedule(jobInfo);
         if (result == JobScheduler.RESULT_SUCCESS) Log.d("TAG", "Job scheduled successfully!");
+    }
+
+
+    private void scheduleAlarm(){
+
+        AlarmUtil util = new AlarmUtil();
+        util.setAlarm(this);
     }
 
 }

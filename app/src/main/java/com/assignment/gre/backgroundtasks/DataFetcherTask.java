@@ -49,7 +49,6 @@ public class DataFetcherTask extends AsyncTask<Void,Void,ArrayList<HashMap<Strin
 
         RequestQueue requestQueue = VolleySingleton.getInstance(mContext).getRequestQueue();
         ArrayList<HashMap<String,Object>> data = JSONHelper.requestData(requestQueue, Constants.assignmentURL);
-        Log.v("kramnik",data.toString());
         DatabaseUtil.populateDatabase(data,mContext);
         return data;
     }
@@ -57,7 +56,6 @@ public class DataFetcherTask extends AsyncTask<Void,Void,ArrayList<HashMap<Strin
     @Override
     protected void onPostExecute(ArrayList<HashMap<String, Object>> data) {
         super.onPostExecute(data);
-        Log.v("gyu",data.toString());
         ArrayList<HashMap<String,Object>> wordlist= data;
         mListener.onWordListDownloaded(wordlist);
     }

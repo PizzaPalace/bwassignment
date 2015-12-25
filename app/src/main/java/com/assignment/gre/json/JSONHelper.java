@@ -1,13 +1,18 @@
 package com.assignment.gre.json;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
+import com.assignment.gre.adapters.RecyclerAdapter;
 import com.assignment.gre.common.Constants;
 import com.assignment.gre.common.DatabaseUtil;
+import com.assignment.gre.network.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,6 +86,30 @@ public class JSONHelper {
         }
     }
 
+    public static void asyncRequest(Context context){
 
+        final Context mcontext = context;
 
+        RequestQueue requestQueue = VolleySingleton.getInstance(context).getRequestQueue();
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, Constants.assignmentURL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.v("ResponseFDS: ", response.toString());
+                        ArrayList<HashMap<String,Object>> mdataset = JSONHelper.jsonParser(response);
+                        DatabaseUtil.populateDatabase(mdataset,mcontext);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        Log.v("ERROR", error.toString());
+
+                    }
+                });
+
+        requestQueue.add(jsObjRequest);
+    }
 }

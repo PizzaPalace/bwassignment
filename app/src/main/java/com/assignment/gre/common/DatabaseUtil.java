@@ -34,7 +34,7 @@ public class DatabaseUtil {
             database.insertData(id,word,meaning,ratio);
         }
 
-        database.queryAllData();
+        //database.queryAllData();
     }
 
     // method to read all values from the database
