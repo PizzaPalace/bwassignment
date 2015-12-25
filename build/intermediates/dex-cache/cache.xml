@@ -23,6 +23,13 @@
         <dex dex="C:\Users\rahul\Downloads\opentok-android-sdk-samples-master\gre\app\build\intermediates\pre-dexed\debug\classes-5c75c3c3683f81bd014719465c35a16aaed302a2.jar" />
     </item>
     <item
+        jar="C:\Users\rahul\Downloads\opentok-android-sdk-samples-master\gre\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\22.2.1\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="3abb4b88f5a8a0584a9b01d3170d7165f12f8588">
+        <dex dex="C:\Users\rahul\Downloads\opentok-android-sdk-samples-master\gre\app\build\intermediates\pre-dexed\debug\classes-69c8094b0804ed1fa683161e1e4e9a0c10e20c82.jar" />
+    </item>
+    <item
         jar="C:\Users\rahul\Downloads\opentok-android-sdk-samples-master\gre\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\classes.jar"
         jumboMode="false"
         revision="21.1.2"

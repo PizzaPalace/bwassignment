@@ -11,13 +11,22 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.assignment.gre.R;
 import com.assignment.gre.fragments.ContentFragment;
 import com.assignment.gre.fragments.NavigationDrawerFragment;
+import com.assignment.gre.network.VolleySingleton;
 import com.assignment.gre.views.SlidingTabLayout;
+
+import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity
@@ -57,6 +66,28 @@ public class MainActivity extends AppCompatActivity
         //color of the tab indicator
         mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
         mTabs.setViewPager(mViewPager);
+
+        RequestQueue requestQueue = VolleySingleton.getInstance(getApplicationContext()).getRequestQueue();
+        String url = "http://appsculture.com/vocab/words.json";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.v("Response: ", response.toString());
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        Log.v("ERROR",error.toString());
+
+                    }
+                });
+
+        requestQueue.add(jsObjRequest);
+
     }
 
 
