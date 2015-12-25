@@ -10,4 +10,8 @@ public final class Constants {
     public static final String MEANING = "meaning";
     public static final String RATIO = "ratio";
 
+    public static final String assignmentURL = "http://appsculture.com/vocab/words.json";
+    public static final String partialImageURL = "http://appsculture.com/vocab/images/";
+
+
 }

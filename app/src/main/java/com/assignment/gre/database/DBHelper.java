@@ -77,7 +77,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }// end of insert data
 
 
-    public void queryAllData(){
+    public ArrayList<HashMap<String,Object>> queryAllData(){
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.query(DBContract.DBEntry.TABLE_NAME, //Table Name
                 null, //Table Number
@@ -114,6 +114,8 @@ public class DBHelper extends SQLiteOpenHelper {
         else{
             Log.v("RESULT", "SORRY BUT THIS LIST IS EMPTY");
         }
+
+        return mData;
     }// end of query data function
 
     public int deleteAllData(){
@@ -121,5 +123,28 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = getWritableDatabase();
         result = database.delete(DBContract.DBEntry.TABLE_NAME,null,null);
         return result;
+    }
+
+    public boolean isDatabaseEmpty(){
+
+        boolean isEmpty;
+        SQLiteDatabase database = getReadableDatabase();
+        Cursor cursor = database.query(DBContract.DBEntry.TABLE_NAME, //Table Name
+                null, //Table Number
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        if (cursor.getCount() == 0){
+            isEmpty = true;
+        }
+        else{
+            isEmpty = false;
+        }
+
+        return isEmpty;
     }
 }

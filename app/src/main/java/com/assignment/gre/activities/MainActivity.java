@@ -1,8 +1,15 @@
 package com.assignment.gre.activities;
 
+import android.annotation.TargetApi;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -20,12 +27,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.assignment.gre.R;
 import com.assignment.gre.common.Constants;
+import com.assignment.gre.common.DatabaseUtil;
 import com.assignment.gre.database.DBHelper;
 import com.assignment.gre.fragments.ContentFragment;
 import com.assignment.gre.fragments.NavigationDrawerFragment;
 import com.assignment.gre.network.VolleySingleton;
+import com.assignment.gre.services.SyncService;
 import com.assignment.gre.views.SlidingTabLayout;
 
 import org.json.JSONArray;
@@ -34,13 +44,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 public class MainActivity extends AppCompatActivity
-                          implements NavigationDrawerFragment.OnFragmentInteractionListener,
-                                     ContentFragment.OnFragmentInteractionListener{
+        implements NavigationDrawerFragment.OnFragmentInteractionListener,
+        ContentFragment.OnFragmentInteractionListener{
 
-
+    JobScheduler mJobScheduler;
     private static int count = 3;
 
     private Toolbar mToolbar;
@@ -48,6 +61,9 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private ViewPager mViewPager;
     private SlidingTabLayout mTabs;
+
+    private static final long POLL_FREQUENCY = 28800000;
+    private static final int JOB_ID = 100;
 
     // Datastructure to hold key-value pairs
     ArrayList<HashMap<String,Object>> mData;
@@ -58,29 +74,19 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mToolbar = (Toolbar)findViewById(R.id.app_bar);
+        mToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(mToolbar);
 
-        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mDrawerFragment = (NavigationDrawerFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        mDrawerFragment.intializeDrawer(R.id.fragment_navigation_drawer,mDrawerLayout,mToolbar);
+        initializeDrawerLayout();
+        intializeViewPager();
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(new SlidingPagerAdapter(getSupportFragmentManager()));
-        mTabs = (SlidingTabLayout) findViewById(R.id.sliding_tab_layout);
-        mTabs.setCustomTabView(R.layout.tab_view, R.id.tabText);
-        //make sure all tabs take the full horizontal screen space and divide it equally amongst themselves
-        mTabs.setDistributeEvenly(true);
-        mTabs.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        //color of the tab indicator
-        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
-        mTabs.setViewPager(mViewPager);
+        mData = new ArrayList<HashMap<String, Object>>();
 
-        mData = new ArrayList<HashMap<String,Object>>();
+        //RequestQueue requestQueue = VolleySingleton.getInstance(getApplicationContext()).getRequestQueue();
+        //String url = "http://appsculture.com/vocab/words.json";
+        //requestMoviesJSON(requestQueue,Constants.assignmentURL);
 
-        RequestQueue requestQueue = VolleySingleton.getInstance(getApplicationContext()).getRequestQueue();
-        String url = "http://appsculture.com/vocab/words.json";
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+        /*JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
@@ -93,12 +99,38 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO Auto-generated method stub
-                        Log.v("ERROR",error.toString());
+                        Log.v("ERROR", error.toString());
 
                     }
                 });
 
-        requestQueue.add(jsObjRequest);
+        requestQueue.add(jsObjRequest);*/
+
+        //setupJob();
+
+
+
+    }
+
+    private void initializeDrawerLayout(){
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        mDrawerFragment.intializeDrawer(R.id.fragment_navigation_drawer, mDrawerLayout, mToolbar);
+    }
+
+    private void intializeViewPager(){
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(new SlidingPagerAdapter(getSupportFragmentManager()));
+        mTabs = (SlidingTabLayout) findViewById(R.id.sliding_tab_layout);
+        mTabs.setCustomTabView(R.layout.tab_view, R.id.tabText);
+        //make sure all tabs take the full horizontal screen space and divide it equally amongst themselves
+        mTabs.setDistributeEvenly(true);
+        mTabs.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        //color of the tab indicator
+        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
+        mTabs.setViewPager(mViewPager);
     }
 
     @Override
@@ -146,7 +178,6 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
 
             ContentFragment fragment = ContentFragment.newInstance("","");
-
             return fragment;
         }
 
@@ -176,9 +207,8 @@ public class MainActivity extends AppCompatActivity
                 map = null;
 
             }
-            //map = null;
+
             Log.v("data",mData.toString());
-            //setViewPagerAdapter();
             populateDatabase();
         }
         catch(JSONException exception){
@@ -186,7 +216,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // method to check database's schema
     private void populateDatabase(){
 
         DBHelper database = new DBHelper(this);
@@ -211,15 +240,30 @@ public class MainActivity extends AppCompatActivity
         database.queryAllData();
     }
 
-    /*private void setViewPagerAdapter(){
+    private void setupJob() {
+        mJobScheduler = (JobScheduler)getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        //set an initial delay with a Handler so that the data loading by the JobScheduler does not clash with the loading inside the Fragment
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //schedule the job after the delay has been elapsed
+                buildJob();
+            }
+        }, 10000);
+    }
 
-        mViewPager.setAdapter(new SlidingPagerAdapter(getSupportFragmentManager()));
-        mTabs.setCustomTabView(R.layout.tab_view, R.id.tabText);
-        //make sure all tabs take the full horizontal screen space and divide it equally amongst themselves
-        mTabs.setDistributeEvenly(true);
-        mTabs.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        //color of the tab indicator
-        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
-        mTabs.setViewPager(mViewPager);
-    }*/
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void buildJob() {
+
+        ComponentName serviceName = new ComponentName(this, SyncService.class);
+        JobInfo jobInfo = new JobInfo.Builder(JOB_ID, serviceName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setRequiresDeviceIdle(false)
+                .setRequiresCharging(true)
+                .build();
+        int result = mJobScheduler.schedule(jobInfo);
+        if (result == JobScheduler.RESULT_SUCCESS) Log.d("TAG", "Job scheduled successfully!");
+    }
+
 }

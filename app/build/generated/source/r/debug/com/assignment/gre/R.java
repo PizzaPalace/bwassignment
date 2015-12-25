@@ -1621,14 +1621,14 @@ containing a value of this type.
         public static final int icon=0x7f0a002c;
         public static final int ifRoom=0x7f0a0019;
         public static final int image=0x7f0a0029;
-        public static final int image_view=0x7f0a0065;
+        public static final int image_view=0x7f0a0064;
         public static final int info=0x7f0a0061;
         public static final int item_touch_helper_previous_elevation=0x7f0a0005;
         public static final int line1=0x7f0a005b;
         public static final int line3=0x7f0a005f;
         public static final int listMode=0x7f0a000a;
         public static final int list_item=0x7f0a002b;
-        public static final int meaning_text_view=0x7f0a0064;
+        public static final int meaning_text_view=0x7f0a0065;
         public static final int media_actions=0x7f0a0059;
         public static final int middle=0x7f0a0016;
         public static final int multiply=0x7f0a001f;

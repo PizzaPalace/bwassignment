@@ -7,12 +7,24 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.assignment.gre.R;
 import com.assignment.gre.adapters.RecyclerAdapter;
+import com.assignment.gre.common.Constants;
+import com.assignment.gre.common.DatabaseUtil;
+import com.assignment.gre.json.JSONHelper;
+import com.assignment.gre.network.VolleySingleton;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +42,6 @@ public class ContentFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String DATA = "DATA";
-
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -40,7 +50,7 @@ public class ContentFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-
+    //String[] mdataset;
     ArrayList<HashMap<String,Object>> mdataset;
 
     private OnFragmentInteractionListener mListener;
@@ -59,8 +69,6 @@ public class ContentFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
-
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,7 +83,6 @@ public class ContentFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-
         }
     }
 
@@ -93,8 +100,18 @@ public class ContentFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new RecyclerAdapter(mdataset);
-        mRecyclerView.setAdapter(mAdapter);
+        if(DatabaseUtil.isDBEmpty(getActivity())){
+            Log.v("tr","re");
+            setAdapter();
+
+        }
+        else{
+
+            mdataset = DatabaseUtil.readDatabase(getActivity());
+        }
+
+        //mAdapter = new RecyclerAdapter(mdataset);
+        //mRecyclerView.setAdapter(mAdapter);
 
         return view;
     }
@@ -138,12 +155,31 @@ public class ContentFragment extends Fragment {
         public void onContentFragmentInteraction(Uri uri);
     }
 
-    public void setAdapter(ArrayList<HashMap<String,Object>> data){
+    private void setAdapter(){
 
-        mdataset = data;
-        if(data != null) {
-            mAdapter = new RecyclerAdapter(mdataset);
-            mRecyclerView.setAdapter(mAdapter);
-        }
+        RequestQueue requestQueue = VolleySingleton.getInstance(getActivity()).getRequestQueue();
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, Constants.assignmentURL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.v("Response: ", response.toString());
+                        mdataset = JSONHelper.jsonParser(response);
+                        mAdapter = new RecyclerAdapter(mdataset,getActivity());
+                        mRecyclerView.setAdapter(mAdapter);
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        Log.v("ERROR", error.toString());
+
+                    }
+                });
+
+        requestQueue.add(jsObjRequest);
     }
+
 }
