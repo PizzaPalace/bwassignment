@@ -35,7 +35,7 @@ public class SyncService extends JobService implements GREListListener {
 
     @Override
     public void onWordListDownloaded(ArrayList<HashMap<String, Object>> wordlist) {
-        Log.v("HI4",wordlist.toString());
+        //Log.v("HI4",wordlist.toString());
         jobFinished(mJobParams, false);
     }
 }

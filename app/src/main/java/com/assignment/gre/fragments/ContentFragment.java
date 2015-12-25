@@ -19,9 +19,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.assignment.gre.R;
 import com.assignment.gre.adapters.RecyclerAdapter;
+import com.assignment.gre.backgroundtasks.DataFetcherTask;
+import com.assignment.gre.backgroundtasks.ReadDatabaseTask;
 import com.assignment.gre.common.Constants;
 import com.assignment.gre.common.DatabaseUtil;
 import com.assignment.gre.json.JSONHelper;
+import com.assignment.gre.listeners.DatabaseListener;
+import com.assignment.gre.listeners.GREListListener;
 import com.assignment.gre.network.VolleySingleton;
 
 import org.json.JSONObject;
@@ -37,7 +41,8 @@ import java.util.HashMap;
  * Use the {@link ContentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContentFragment extends Fragment {
+public class ContentFragment extends Fragment
+        implements GREListListener, DatabaseListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -101,17 +106,18 @@ public class ContentFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         if(DatabaseUtil.isDBEmpty(getActivity())){
-            Log.v("tr","re");
+            Log.v("h3333i","dadas33333d");
             setAdapter();
-
         }
-        else{
-
-            mdataset = DatabaseUtil.readDatabase(getActivity());
+        else {
+            Log.v("hi","dadasd");
+            new ReadDatabaseTask(this, getActivity().getApplicationContext()).execute();
         }
 
-        //mAdapter = new RecyclerAdapter(mdataset);
-        //mRecyclerView.setAdapter(mAdapter);
+        /*mdataset = DatabaseUtil.readDatabase(getActivity());
+            mAdapter = new RecyclerAdapter(mdataset,getActivity());
+            mRecyclerView.setAdapter(mAdapter);*/
+
 
         return view;
     }
@@ -138,6 +144,18 @@ public class ContentFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onWordListDownloaded(ArrayList<HashMap<String, Object>> wordlist) {
+        Log.v("somme","senne");
+        setAdapter(wordlist);
+    }
+
+    @Override
+    public void onDatabaseQueried(ArrayList<HashMap<String, Object>> wordlist) {
+        Log.v("dfsfsdf","Sdfsdfsdf");
+        setAdapter(wordlist);
     }
 
     /**
@@ -167,7 +185,7 @@ public class ContentFragment extends Fragment {
                         mdataset = JSONHelper.jsonParser(response);
                         mAdapter = new RecyclerAdapter(mdataset,getActivity());
                         mRecyclerView.setAdapter(mAdapter);
-
+                        DatabaseUtil.populateDatabase(mdataset,getActivity());
                     }
                 }, new Response.ErrorListener() {
 
@@ -180,6 +198,13 @@ public class ContentFragment extends Fragment {
                 });
 
         requestQueue.add(jsObjRequest);
+    }
+
+    private void setAdapter(ArrayList<HashMap<String,Object>> wordlist){
+
+        mdataset = wordlist;
+        mAdapter = new RecyclerAdapter(mdataset,getActivity());
+        mRecyclerView.setAdapter(mAdapter);
     }
 
 }

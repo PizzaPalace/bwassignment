@@ -121,7 +121,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public int deleteAllData(){
         int result = -1;
         SQLiteDatabase database = getWritableDatabase();
-        result = database.delete(DBContract.DBEntry.TABLE_NAME,null,null);
+        if(database != null)
+            result = database.delete(DBContract.DBEntry.TABLE_NAME,null,null);
         return result;
     }
 

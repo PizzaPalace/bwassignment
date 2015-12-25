@@ -49,6 +49,7 @@ public class DataFetcherTask extends AsyncTask<Void,Void,ArrayList<HashMap<Strin
 
         RequestQueue requestQueue = VolleySingleton.getInstance(mContext).getRequestQueue();
         ArrayList<HashMap<String,Object>> data = JSONHelper.requestData(requestQueue, Constants.assignmentURL);
+        Log.v("kramnik",data.toString());
         DatabaseUtil.populateDatabase(data,mContext);
         return data;
     }
